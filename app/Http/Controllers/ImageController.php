@@ -9,46 +9,50 @@ class ImageController extends Controller
 {
     public function index(Request $request)
     {
-        //
+        $userImages = auth()->user()?->images ?? [];
+
+        return response()->successJson($userImages);
     }
 
-    public function show(Request $request)
+    public function show(Image $image)
     {
-//        $request->validate([
-//            'image' => 'required|image|mimes:jpeg,png|max:2048'
-//        ]);
-//
-//        $path = $request->file('image')->store('images');
-//        dd($path);
+        return response()->successJson($image);
     }
 
     public function create(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png|max:2048' /// why jpg is being skipped?
+            'image' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
         ]);
 
         $user = auth()->user();
 
-//        $user->images()->attach()
         $file = $request->file('image');
-        $file->store('images');
+        $hash = hash('sha256', file_get_contents($file->getRealPath()));
+        $image = Image::query()->where('hash', $hash)->first();
 
-        $uploadedFile = Image::create([
-            'original_name' => $file->getClientOriginalName(),
-            'path' => $file->path(),
-            'hash' => 'hash',
-            'size' => $file->getSize(),
-            'status' => 'draft'
-        ]);
+        if(!$image){
+            $file->store('images');
 
-        $user->images()->attach($uploadedFile->id);
+            $image = Image::create([
+                'original_name' => $file->getClientOriginalName(),
+                'path' => $file->path(),
+                'hash' => $hash,
+                'size' => $file->getSize(),
+                'status' => 'draft'
+            ]);
+        }
 
-        return response()->successJson($uploadedFile);
+        $user->images()->syncWithoutDetaching($image->id);
+
+        return response()->successJson($image);
     }
 
-    public function delete(Request $request)
+    public function delete(Image $image)
     {
-//
+        $user = auth()->user();
+        $user->images()->detach($image->id);
+
+        return response()->successJson(['message'=>'The image has been deleted successfully']);
     }
 }
