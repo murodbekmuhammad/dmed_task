@@ -3,56 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Models\Image;
+use App\Requests\Image\CreateImageRequest;
+use App\Services\Image\ImageService;
 use Illuminate\Http\Request;
 
 class ImageController extends Controller
 {
+    public function __construct(protected ImageService $service) {}
+
     public function index(Request $request)
     {
-        $userImages = auth()->user()?->images ?? [];
-
-        return response()->successJson($userImages);
+        return response()->successJson($this->service->index());
     }
 
+    /**
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
     public function show(Image $image)
     {
-        return response()->successJson($image);
+        return response()->successJson($this->service->show($image));
     }
 
-    public function create(Request $request)
+    public function store(CreateImageRequest $request)
     {
-        $request->validate([
-            'image' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
-        ]);
-
-        $user = auth()->user();
-
         $file = $request->file('image');
-        $hash = hash('sha256', file_get_contents($file->getRealPath()));
-        $image = Image::query()->where('hash', $hash)->first();
 
-        if(!$image){
-            $file->store('images');
-
-            $image = Image::create([
-                'original_name' => $file->getClientOriginalName(),
-                'path' => $file->path(),
-                'hash' => $hash,
-                'size' => $file->getSize(),
-                'status' => 'draft'
-            ]);
-        }
-
-        $user->images()->syncWithoutDetaching($image->id);
-
-        return response()->successJson($image);
+        return response()->successJson($this->service->create($file));
     }
 
-    public function delete(Image $image)
+    public function destroy(Image $image)
     {
-        $user = auth()->user();
-        $user->images()->detach($image->id);
-
-        return response()->successJson(['message'=>'The image has been deleted successfully']);
+        return response()->successJson($this->service->delete($image));
     }
 }
