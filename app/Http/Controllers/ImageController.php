@@ -13,7 +13,7 @@ class ImageController extends Controller
 
     public function index(Request $request)
     {
-        return response()->successJson($this->service->index());
+        return response()->successJson($this->service->index($request->user()));
     }
 
     /**
@@ -28,11 +28,11 @@ class ImageController extends Controller
     {
         $file = $request->file('image');
 
-        return response()->successJson($this->service->create($file));
+        return response()->successJson($this->service->create($request->user(), $file));
     }
 
-    public function destroy(Image $image)
+    public function destroy(Request $request, Image $image)
     {
-        return response()->successJson($this->service->delete($image));
+        return response()->successJson($this->service->delete($request->user(), $image));
     }
 }

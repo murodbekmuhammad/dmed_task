@@ -13,9 +13,7 @@ class ImagePolicy
      */
     public function view(User $user, Image $image): bool
     {
-        return $image->users()
-            ->where('users.id', $user->id)
-            ->exists();
+        return $user->images()->where('image_id', $image->id)->exists();
     }
 
     /**
@@ -23,8 +21,6 @@ class ImagePolicy
      */
     public function delete(User $user, Image $image): bool
     {
-        return $image->users()
-            ->where('users.id', $user->id)
-            ->exists();
+        return $user->images()->where('image_id', $image->id)->exists();
     }
 }

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('path');
             $table->string('original_name');
-            $table->string('hash');
+            $table->string('hash')->index();
             $table->string('size');
             $table->string('status');
             $table->timestamps();
