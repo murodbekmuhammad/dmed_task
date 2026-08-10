@@ -1,59 +1,227 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# DMED TASK
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 📌 Features
 
-## About Laravel
+- **JWT Authentication**: Secured endpoints using `php-open-source-saver/jwt-auth` with Bearer token header authorization.
+- **SHA-256 Image Deduplication**: Computes SHA-256 hash of incoming uploaded files to prevent storing identical images multiple times on disk and in database.
+- **WebP Optimization**: Converts uploaded images to standard high-efficiency WebP format using `Intervention/image-laravel` with GD driver.
+- **Asynchronous Queue Processing**: Handles heavy image reading, hash computation, WebP conversion, and storage asynchronously via Laravel Queues and `ProcessImageJob`.
+- **Repository & Service Pattern**: Clean, maintainable software architecture using `BaseService` / `ImageService` and `BaseRepository` / `ImageRepository` for separation of business logic and data access.
+- **User-Scoped Ownership & Shared Deletion**: Tracks user-image relationships via pivot (`syncWithoutDetaching`). Safely detaches image records on user delete and deletes physical storage files only when no user reference remains.
+- **Custom Authorization Policies**: Protects image access and deletion using Laravel Policies (`can:view,image`, `can:delete,image`).
+- **Standardized Response Macros**: Custom response macros (`Response::successJson` and `Response::errorJson`) providing uniform API response structures.
+- **Automatic Failure & Temporary File Cleanup**: Automatically cleans up temporary upload paths upon job completion or failure.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## ⚙️ Installation & Setup
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Prerequisites
+- **PHP**: `^8.2`
+- **Composer**
+- **Database**: MySQL
 
-## Learning Laravel
+### Steps
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/murodbekmuhammad/dmed_task
+   cd dmed-task
+   ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. **Install PHP**
+   ```bash
+   composer install
+   ```
 
-## Laravel Sponsors
+3. **Configure env**
+   ```bash
+   cp .env.example .env
+   ```
+4. **Generate Application Key & JWT Secret**
+   ```bash
+   php artisan key:generate
+   php artisan jwt:secret
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+5. **Run Migrations & Seeders**
+   ```bash
+   php artisan migrate
+   php artisan db:seed
+   ```
 
-### Premium Partners
+6. **Create Storage Symbolic Link**
+   ```bash
+   php artisan storage:link
+   ```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## 🚀 Running the Application
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Alternatively, start the server and queue worker manually:
+```bash
+php artisan serve
+php artisan queue:work
+```
+---
 
-## Code of Conduct
+## 📖 API Documentation
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+All API requests expecting JSON responses should include the header:
+```http
+Accept: application/json
+```
 
-## Security Vulnerabilities
+### 🔑 Authentication
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+#### 1. User Login
+- **URL**: `/api/login`
+- **Method**: `POST`
+- **Auth**: None
+- **Body (`application/json`)**:
+  | Parameter | Type | Required | Description |
+  |---|---|---|---|
+  | `email` | `string` | Yes | Valid user email address |
+  | `password` | `string` | Yes | User password |
 
-## License
+- **Success Response (200)**:
+  ```json
+  {
+    "success": true,
+    "message": "Login successful",
+    "data": {
+      "access_token": "<jwt-token>",
+      "token_type": "bearer",
+      "expires_in": 3600
+    }
+  }
+  ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+### 🖼️ Images Management
+
+> **Note**: All routes below require the header:
+> `Authorization: Bearer <access_token>`
+
+#### 2. Get User Images (Paginated)
+- **URL**: `/api/images`
+- **Method**: `GET`
+- **Auth**: Bearer Token
+- **Success Response (200)**: Returns a paginated list of uploaded images owned by the user.
+ ```json 
+{
+    "success": true,
+    "message": "Success",
+    "data": {
+        "current_page": 1,
+        "data": [
+            {
+                "id": 14,
+                "path": "images/7ec7ee9e33bed730f4df0d53ab35fe3d53aeb84a77d3fc1ffd46d4e621f89a1a.webp",
+                "original_name": "2026-07-29 17.36.23.jpg",
+                "hash": "7ec7ee9e33bed730f4df0d53ab35fe3d53aeb84a77d3fc1ffd46d4e621f89a1a",
+                "size": "2624",
+                "status": "completed",
+                "created_at": "2026-08-10T03:55:44.000000Z",
+                "updated_at": "2026-08-10T03:55:44.000000Z",
+                "pivot": {
+                    "user_id": 9,
+                    "image_id": 14,
+                    "created_at": "2026-08-10T03:55:44.000000Z",
+                    "updated_at": "2026-08-10T03:55:44.000000Z"
+                }
+            }
+        ],
+        "first_page_url": "http://127.0.0.1:8000/api/images?page=1",
+        "from": 1,
+        "last_page": 1,
+        "last_page_url": "http://127.0.0.1:8000/api/images?page=1",
+        "links": [
+            {
+                "url": null,
+                "label": "&laquo; Previous",
+                "page": null,
+                "active": false
+            },
+            {
+                "url": "http://127.0.0.1:8000/api/images?page=1",
+                "label": "1",
+                "page": 1,
+                "active": true
+            },
+            {
+                "url": null,
+                "label": "Next &raquo;",
+                "page": null,
+                "active": false
+            }
+        ],
+        "next_page_url": null,
+        "path": "http://127.0.0.1:8000/api/images",
+        "per_page": 15,
+        "prev_page_url": null,
+        "to": 1,
+        "total": 1
+    }
+}
+```
+      
+#### 3. Upload New Image
+- **URL**: `/api/images`
+- **Method**: `POST`
+- **Auth**: Bearer Token
+- **Body (`multipart/form-data`)**:
+  | Parameter | Type | Required | Rules |
+  |---|---|---|---|
+  | `image` | `file` | Yes | `jpeg`, `jpg`, `png` (Max: 5MB) |
+
+- **Success Response (200)**:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "message": "Image upload received.",
+      "status": "processing"
+    }
+  }
+  ```
+
+#### 4. Get Specific Image Details
+- **URL**: `/api/images/{id}`
+- **Method**: `GET`
+- **Auth**: Bearer Token
+- **Success Response (200)**: Returns image details if user is authorized.
+```json 
+{
+  "success": true,
+  "message": "Success",
+  "data": {
+      "id": 14,
+      "path": "images/7ec7ee9e33bed730f4df0d53ab35fe3d53aeb84a77d3fc1ffd46d4e621f89a1a.webp",
+      "original_name": "2026-07-29 17.36.23.jpg",
+      "hash": "7ec7ee9e33bed730f4df0d53ab35fe3d53aeb84a77d3fc1ffd46d4e621f89a1a",
+      "size": "2624",
+      "status": "completed",
+      "created_at": "2026-08-10T03:55:44.000000Z",
+      "updated_at": "2026-08-10T03:55:44.000000Z"
+      }
+  }
+```
+
+#### 5. Delete Image
+- **URL**: `/api/images/{id}`
+- **Method**: `DELETE`
+- **Auth**: Bearer Token
+- **Success Response (200)**:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "message": "The image has been deleted successfully"
+    }
+  }
+  ```
+
+---
