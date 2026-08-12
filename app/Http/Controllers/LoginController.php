@@ -6,8 +6,19 @@ use App\Requests\Auth\LoginRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @class LoginController
+ *
+ * @package App\Http\Controllers
+ */
 class LoginController extends Controller
 {
+    /**
+     * login
+     *
+     * @param LoginRequest $request
+     * @return JsonResponse
+     */
     public function login(LoginRequest $request): JsonResponse
     {
         $credentials = $request->only(['email', 'password']);
@@ -20,7 +31,11 @@ class LoginController extends Controller
     }
 
     /**
+     * respondWithToken
      * Format the token response.
+     *
+     * @param string $token
+     * @return JsonResponse
      */
     protected function respondWithToken(string $token): JsonResponse
     {

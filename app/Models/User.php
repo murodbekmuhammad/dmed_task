@@ -7,7 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+/**
+ * @class User
+ *
+ * @package App\Models
+ */
 class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<UserFactory> */
@@ -35,6 +41,7 @@ class User extends Authenticatable implements JWTSubject
     ];
 
     /**
+     * casts
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -48,6 +55,7 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
+     * getJWTIdentifier
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
      * @return mixed
@@ -58,6 +66,7 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
+     * getJWTCustomClaims
      * Return a key value array, containing any custom claims to be added to the JWT.
      *
      * @return array
@@ -68,7 +77,12 @@ class User extends Authenticatable implements JWTSubject
         ];
     }
 
-    public function images(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    /**
+     * images
+     *
+     * @return BelongsToMany
+     */
+    public function images(): BelongsToMany
     {
         return $this->belongsToMany(Image::class)->withTimestamps();
     }

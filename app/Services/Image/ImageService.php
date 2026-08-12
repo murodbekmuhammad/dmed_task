@@ -12,23 +12,53 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * @class ImageService
+ *
+ * @package App\Services\Image
+ */
 class ImageService extends BaseService
 {
+    /**
+     * __construct
+     *
+     * @param ImageRepository $repository
+     */
     public function __construct(ImageRepository $repository)
     {
         $this->repository = $repository;
     }
 
+    /**
+     * index
+     *
+     * @param User $user
+     * @param int $perPage
+     * @return LengthAwarePaginator
+     */
     public function index(User $user, int $perPage = 15): LengthAwarePaginator
     {
         return $user->images()->paginate($perPage);
     }
 
+    /**
+     * show
+     *
+     * @param Image $image
+     * @return Image
+     */
     public function show(Image $image): Image
     {
         return $image;
     }
 
+    /**
+     * create
+     *
+     * @param User $user
+     * @param UploadedFile|null $file
+     * @return array|null
+     */
     public function create(User $user, ?UploadedFile $file): ?array
     {
         if (!$file) {
@@ -49,6 +79,13 @@ class ImageService extends BaseService
         ];
     }
 
+    /**
+     * delete
+     *
+     * @param User $user
+     * @param Image $image
+     * @return array
+     */
     public function delete(User $user, Image $image): array
     {
         DB::transaction(function () use ($user, $image) {
@@ -65,4 +102,3 @@ class ImageService extends BaseService
         ];
     }
 }
-

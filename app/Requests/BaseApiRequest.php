@@ -19,7 +19,10 @@ abstract class BaseApiRequest extends FormRequest
     public $params;
 
     /**
+     * getParams
      * Get parameters
+     *
+     * @return mixed
      */
     public function getParams()
     {
@@ -27,6 +30,8 @@ abstract class BaseApiRequest extends FormRequest
     }
 
     /**
+     * failedValidation
+     *
      * @param Validator $validator
      * @return mixed
      */

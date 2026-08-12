@@ -11,12 +11,22 @@ use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
 
+/**
+ * @class ProcessImageJob
+ *
+ * @package App\Jobs
+ */
 class ProcessImageJob implements ShouldQueue
 {
     use Queueable;
 
     /**
+     * __construct
      * Create a new job instance.
+     *
+     * @param User $user
+     * @param string $tempPath
+     * @param string $originalName
      */
     public function __construct(
         protected User $user,
@@ -26,7 +36,10 @@ class ProcessImageJob implements ShouldQueue
     }
 
     /**
+     * handle
      * Execute the job.
+     *
+     * @return void
      */
     public function handle(): void
     {
@@ -68,7 +81,11 @@ class ProcessImageJob implements ShouldQueue
     }
 
     /**
+     * failed
      * Handle job failure cleanup.
+     *
+     * @param \Throwable $exception
+     * @return void
      */
     public function failed(\Throwable $exception): void
     {

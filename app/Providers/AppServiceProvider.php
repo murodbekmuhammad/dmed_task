@@ -5,10 +5,18 @@ namespace App\Providers;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * @class AppServiceProvider
+ *
+ * @package App\Providers
+ */
 class AppServiceProvider extends ServiceProvider
 {
     /**
+     * register
      * Register any application services.
+     *
+     * @return void
      */
     public function register(): void
     {
@@ -16,7 +24,10 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
+     * boot
      * Bootstrap any application services.
+     *
+     * @return void
      */
     public function boot(): void
     {
